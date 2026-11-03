@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Money</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0E6B4F"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#EEF2EF;--surface:#fff;--ink:#12251F;--mute:#5E6F68;--line:#D3DDD8;--accent:#0E6B4F;--accent-ink:#fff;--warn:#B3402A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1A16;--surface:#16251F;--ink:#E6EFEA;--mute:#9BB0A7;--line:#2A4037;--accent:#46C79B;--accent-ink:#08140F;--warn:#F0907A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1A16;--surface:#16251F;--ink:#E6EFEA;--mute:#9BB0A7;--line:#2A4037;--accent:#46C79B;--accent-ink:#08140F;--warn:#F0907A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:15px;font-weight:600;margin:0;color:var(--mute)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pills{display:flex;gap:6px}
+button,input,select,textarea{font:inherit;color:inherit}
+.pill{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hero{margin:22px 0 8px}
+.hero .lbl{color:var(--mute);font-size:14px}
+.hero .big{font-size:clamp(38px,12vw,56px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:2px 0 12px}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.split i{display:block;background:var(--accent)}
+.split i+i{background:var(--ink);opacity:.75}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:14px;color:var(--mute)}
+.legend b{color:var(--ink);font-weight:600}
+nav{display:flex;gap:4px;overflow-x:auto;margin:20px 0 14px;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;cursor:pointer;color:var(--mute);white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat span{display:block;color:var(--mute);font-size:13px}
+.stat b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.pos{color:var(--accent)}.neg{color:var(--warn)}
+.bar{display:grid;grid-template-columns:84px 1fr auto;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.bar div{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.row{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.grow{flex:1;min-width:0}
+.grow small{display:block;color:var(--mute)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.form .full{grid-column:1/-1}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+input.amt{width:116px;text-align:right}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 14px;font-weight:600;cursor:pointer}
+.x{background:none;border:0;color:var(--mute);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px}
+.empty{color:var(--mute);margin:4px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
+.msg{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 12px);padding:10px 12px;border-radius:12px;margin:8px 0;white-space:pre-wrap;max-width:92%}
+.msg.user{background:var(--ink);color:var(--bg);margin-left:auto}
+.msg.assistant{background:var(--surface);border:1px solid var(--line)}
+.ask{display:flex;gap:8px;align-items:flex-end}
+.ask textarea{resize:none;height:44px}
+.note{color:var(--mute);font-size:13px;margin-top:8px}
+.pill,.chip,.btn,nav button,.x{transition:background-color .2s,color .2s,border-color .2s,transform .12s ease}
+.pill:active,.chip:active,.btn:active{transform:scale(.96)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.enter #view{animation:rise .24s ease-out both}
+.enter .split i,.enter .bar i{transform-origin:left center;animation:grow .6s cubic-bezier(.2,.7,.2,1) both}
+.msg.new{animation:pop .26s ease-out both}
+.dots{display:inline-flex;gap:4px;padding:4px 0}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--mute);animation:blink 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.2s}
+.dots i:nth-child(3){animation-delay:.4s}
+.row{transition:opacity .18s,transform .18s}
+.row.out{opacity:0;transform:translateX(14px)}
+#saved:not(:empty){animation:rise .3s ease-out both}
+.top h1{flex:1;margin-left:10px}
+.ava,.bigava{background:var(--bg) center/cover;display:grid;place-items:center;font-weight:600}
+.ava{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);color:var(--ink);font-size:12px;cursor:pointer;padding:0;flex:none}
+.bigava{width:96px;height:96px;border-radius:50%;border:1px solid var(--line);font-size:28px;font-weight:800}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);padding:0;max-width:340px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog[open]{animation:pop .24s ease-out}
+.abox{padding:22px;text-align:center;display:grid;gap:10px;justify-items:center}
+.abox h2,.abox p{margin:0}
+a{color:var(--accent)}
+.pill.danger{border-color:var(--warn);color:var(--warn)}
+.fl{display:grid;gap:4px;font-size:13px;color:var(--mute)}
+.big2{font-size:clamp(30px,10vw,44px);font-weight:800;letter-spacing:-.03em}
+.tip{display:grid;gap:2px;padding:6px 0 6px 12px;border-left:3px solid var(--line);margin:10px 0}
+.tip.good{border-left-color:var(--accent)}
+.tip.warn{border-left-color:var(--warn)}
+.tip span{color:var(--mute);font-size:14px}
+.pa{display:inline-grid;place-items:center;border-radius:50%;background:var(--bg) center/cover;border:1px solid var(--line);font-weight:600;font-size:12px;vertical-align:middle;margin-right:8px;flex:none;color:var(--ink)}
+.prow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.prow .pa{margin:0;font-size:20px}
+.pbtn{display:flex;gap:6px;flex-wrap:wrap}
+.seg{display:flex;gap:6px;margin-bottom:8px}
+.dpw{margin:6px 0}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><button class="ava" id="avaBtn" data-act="about" aria-label="About this app"></button><h1>My Money</h1><div class="pills" id="pills"></div></div>
+  <section class="hero" id="hero"></section>
+  <nav id="tabs" role="tablist"></nav>
+  <div id="view"></div>
+</main>
+<dialog id="about" aria-labelledby="abt"><div class="abox"><div class="bigava" id="bigAva"></div><h2 id="abt">Binod Kunwar</h2><p class="note">Maker of My Money</p><p><a href="https://www.instagram.com/urself_binod?vrfl=NXB5MDIwZ2d3YmQx" target="_blank" rel="noopener">@urself_binod</a> on Instagram</p><button class="pill" data-act="photo">Change photo</button><input type="file" id="photo" accept="image/*" hidden><p class="note">Your photo stays on this device. My Money keeps your numbers here too. Only the AI chat and AI plan send the selected profile’s figures to Anthropic, using your own API key, to answer you.</p><button class="btn" data-act="closeAbout">Close</button></div></dialog>
+<script>
+const $=s=>document.querySelector(s);
+const KKEY='mymoney.key';
+const getKey=()=>{try{return localStorage.getItem(KKEY)||''}catch(e){return ''}};
+window.claude={use:async n=>n==='sample'?async function(input,opts){
+  const key=getKey();if(!key)throw{code:'no_key'};
+  const messages=typeof input==='string'?[{role:'user',content:input}]:input;
+  let r;try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:900,messages})})}catch(e){throw{code:'network'}}
+  if(r.status===401||r.status===403)throw{code:'bad_key'};
+  if(r.status===429)throw{code:'rate_limited'};
+  if(!r.ok)throw{code:'error'};
+  const d=await r.json();const text=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  if(opts&&opts.onText)opts.onText({text});return{text};
+}:null};
+function keyCard(){const has=!!getKey();return `<div class="card"><h2>AI key</h2>${has?'<p class="note">An API key is saved on this device.</p><button class="pill" data-act="keyDel">Remove key</button>':'<p class="note">The AI needs your own Anthropic API key. It is stored only on this device and sent only to Anthropic. Each question costs a small amount.</p><input type="password" id="akey" autocomplete="off" placeholder="Paste your API key"><button class="btn" style="margin-top:8px" data-act="keySave">Save key</button>'}</div>`}
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>{const c=CUR();return (n<0?'−':'')+c[0]+new Intl.NumberFormat(c[1],{maximumFractionDigits:0}).format(Math.abs(Math.round(n||0)))};
+const KEY='mymoney.v1';
+const CATS=['Food','Rent','Transport','Bills','Shopping','Health','Fun','Other'];
+const TYPES=['Stocks','Mutual fund','Fixed deposit','Gold','Other'];
+const COUNTRY={'India':['₹','en-IN'],'United States':['$','en-US'],'United Kingdom':['£','en-GB'],'UAE':['AED ','en-AE'],'Canada':['C$','en-CA'],'Australia':['A$','en-AU'],'Singapore':['S$','en-SG'],'Germany':['€','de-DE'],'Other':['','en-US']};
+const CUR=()=>COUNTRY[(S.profiles[S.active]||{}).country]||COUNTRY.India;
+const OCC=['Student','Corporate job','Self-employed','Homemaker','Other'];
+const GEN=['Male','Female','Other','Prefer not to say'];
+const DEBT=['Home loan','Car loan','Two-wheeler loan','Personal loan','Education loan','Gold loan','Credit card','Business loan','Other'];
+const opts=(arr,v,ph)=>`<option value="">${ph}</option>`+arr.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+const TABS=[['overview','Overview'],['banks','Bank accounts'],['inv','Investments'],['spend','Spending'],['debt','Loans and EMIs'],['future','Future net worth'],['tips','Suggestions'],['ai','Ask AI']];
+const blank=n=>({name:n,country:'India',phone:'',email:'',occupation:'',gender:'',income:0,accounts:[],investments:[],spending:[],debts:[]});
+function load(){try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);if(d&&d.profiles&&d.profiles.length===2)return d}}catch(e){}return{active:0,profiles:[blank('Person 1'),blank('Person 2')]}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}}
+let S=load(),tab='overview';const chat=[[],[]];let busy=false;const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;let shown=null,del=null;
+const P=()=>{const p=S.profiles[S.active];if(!p.debts)p.debts=[];if(!p.country)p.country='India';return p};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const num=id=>Math.max(0,parseFloat($('#'+id).value)||0);
+function totals(p){
+  const bank=p.accounts.reduce((a,x)=>a+x.amount,0);
+  const inv=p.investments.reduce((a,x)=>a+x.current,0);
+  const put=p.investments.reduce((a,x)=>a+x.invested,0);
+  const m=p.spending.filter(x=>x.date.startsWith(today().slice(0,7)));
+  const spent=m.reduce((a,x)=>a+x.amount,0);
+  const cats={};m.forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);
+  const owed=p.debts.reduce((a,x)=>a+x.outstanding,0),emi=p.debts.reduce((a,x)=>a+x.emi,0);
+  return{bank,inv,put,spent,cats,m,owed,emi};
+}
+function renderHead(){
+  const p=P(),t=totals(p),assets=t.bank+t.inv,nw=assets-t.owed,pct=assets>0?t.bank/assets*100:0;
+  $('#pills').innerHTML=S.profiles.map((q,i)=>`<button class="pill" data-act="profile:${i}" aria-pressed="${i===S.active}">${esc(q.name)}</button>`).join('');
+  $('#hero').innerHTML=`<div class="lbl">${pav(p,24)}${esc(p.name)}’s net worth</div><div class="big">${fmt(nw)}</div>
+  <div class="split" aria-hidden="true"><i style="width:${pct}%"></i><i style="width:${assets>0?100-pct:0}%"></i></div>
+  <div class="legend"><span>Bank <b>${fmt(t.bank)}</b></span><span>Investments <b>${fmt(t.inv)}</b></span><span>Debt <b>${fmt(t.owed)}</b></span></div>`;
+  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button role="tab" data-act="tab:${k}" aria-selected="${k===tab}">${l}</button>`).join('');
+  const big=$('#hero .big');if(shown!==null&&shown!==nw&&!REDUCED){const from=shown,t0=performance.now(),step=t=>{const k=Math.min(1,(t-t0)/450);big.textContent=fmt(from+(nw-from)*(1-Math.pow(1-k,3)));if(k<1&&big.isConnected)requestAnimationFrame(step)};requestAnimationFrame(step)}
+  shown=nw;
+}
+function vOverview(p){
+  const t=totals(p),gain=t.inv-t.put,left=p.income-t.spent-t.emi,share=p.income?Math.round(t.emi/p.income*100):0;
+  const cats=Object.entries(t.cats).sort((a,b)=>b[1]-a[1]),max=cats.length?cats[0][1]:1;
+  return `<div class="stats">
+    <div class="stat"><span>Spent this month</span><b>${fmt(t.spent)}</b></div>
+    <div class="stat"><span>Left after spending and EMIs</span><b class="${left<0?'neg':''}">${p.income?fmt(left):'Set income'}</b></div>
+    <div class="stat"><span>Invested</span><b>${fmt(t.put)}</b></div>
+    <div class="stat"><span>Investment gain</span><b class="${gain<0?'neg':'pos'}">${gain>=0?'+':'−'}${fmt(Math.abs(gain))}</b></div><div class="stat"><span>Monthly EMIs</span><b>${fmt(t.emi)}</b></div><div class="stat"><span>EMIs as share of income</span><b class="${share>50?'neg':''}">${p.income?share+'%':'Set income'}</b></div></div>
+  <div class="card" style="margin-top:14px"><h2>Where this month’s money went</h2>
+  ${cats.length?cats.map(([c,v])=>`<div class="bar"><span>${esc(c)}</span><div><i style="width:${v/max*100}%"></i></div><span>${fmt(v)}</span></div>`).join(''):'<p class="empty">No spending added for this month yet. Add some in the Spending tab.</p>'}</div>
+  ${p.done?`<div class="card"><h2>${pav(p,32)}${esc(p.name)}</h2><p class="note">${esc([p.occupation,p.country].filter(Boolean).join(', '))}${p.income?', income '+fmt(p.income)+' a month':''}</p><p class="note" id="saved" role="status"></p><button class="btn" data-act="editProfile">Edit profile</button></div>`:`<div class="card"><h2>About ${esc(p.name)}</h2><div class="prow">${pav(p,56)}<div class="pbtn"><button class="pill" data-act="ppic">${p.photo?'Change photo':'Add photo'}</button>${p.photo?'<button class="pill" data-act="ppicx">Remove photo</button>':''}</div><input type="file" id="ppicf" accept="image/*" hidden></div><div class="form"><input class="full" data-edit="name" value="${esc(p.name)}" maxlength="20" placeholder="Name" aria-label="Name"><select data-edit="occupation" aria-label="Occupation">${opts(OCC,p.occupation,'Occupation')}</select><select data-edit="gender" aria-label="Gender">${opts(GEN,p.gender,'Gender')}</select><select class="full" data-edit="country" aria-label="Country">${Object.keys(COUNTRY).map(x=>`<option${x===p.country?' selected':''}>${x}</option>`).join('')}</select><input class="full" type="number" inputmode="decimal" data-edit="income" value="${p.income||''}" placeholder="Monthly income (optional)" aria-label="Monthly income"><input class="full" type="tel" inputmode="tel" autocomplete="tel" data-edit="phone" value="${esc(p.phone||'')}" placeholder="Phone number (optional), with country code" aria-label="Phone number"><input class="full" type="email" inputmode="email" autocomplete="email" data-edit="email" value="${esc(p.email||'')}" placeholder="Email (optional)" aria-label="Email">${p.pw?'<input class="full" type="password" id="pw0" autocomplete="current-password" maxlength="40" placeholder="Current password (only to change it)">':''}<input class="full" type="password" id="pw1" autocomplete="new-password" maxlength="40" placeholder="${p.pw?'New password (leave blank to keep)':'Password (optional), needed to delete data'}"><button class="btn full" data-act="save">Save profile</button><p class="note full" id="saved" role="status"></p></div><p class="note">The AI uses these details to tailor its answers. Your phone number, email and password are never sent to the AI. The password only protects deleting data inside this app and can’t be recovered. Everything is saved in this browser only.</p></div>`}<div class="card"><h2>Your data</h2>${del?delPanel(p):'<button class="pill" data-act="delOpen">Delete data…</button><p class="note">Choose what to delete. If you set a password in your profile, you’ll need it.</p>'}</div>`;
+}
+function vBanks(p){
+  return `<div class="card"><h2>Bank accounts</h2>
+  ${p.accounts.length?p.accounts.map(a=>`<div class="row"><div class="grow"><b>${esc(a.name)}</b></div><input class="amt" type="number" inputmode="decimal" value="${a.amount}" data-edit="acc:${a.id}" aria-label="Balance of ${esc(a.name)}"><button class="x" data-act="delAcc:${a.id}" aria-label="Remove ${esc(a.name)}">×</button></div>`).join(''):'<p class="empty">Add your first bank account to start your net worth.</p>'}
+  <div class="form"><input id="an" placeholder="Account name, e.g. Savings account"><input id="aa" type="number" inputmode="decimal" placeholder="Balance"><button class="btn full" data-act="addAcc">Add account</button></div></div>`;
+}
+function vInv(p){
+  return `<div class="card"><h2>Investments</h2>
+  ${p.investments.length?p.investments.map(i=>{const g=i.current-i.invested,pc=i.invested?g/i.invested*100:0;return `<div class="row"><div class="grow"><b>${esc(i.name)}</b><small>${esc(i.type)} · put in ${fmt(i.invested)} · <span class="${g<0?'neg':'pos'}">${g>=0?'+':'−'}${Math.abs(pc).toFixed(1)}%</span></small></div><input class="amt" type="number" inputmode="decimal" value="${i.current}" data-edit="inv:${i.id}" aria-label="Current value of ${esc(i.name)}"><button class="x" data-act="delInv:${i.id}" aria-label="Remove ${esc(i.name)}">×</button></div>`}).join(''):'<p class="empty">Add stocks, mutual funds, deposits or gold. Update the current value whenever you like.</p>'}
+  <div class="form"><input id="in" class="full" placeholder="Name, e.g. Index fund"><select id="it">${TYPES.map(x=>`<option>${x}</option>`).join('')}</select><input id="ii" type="number" inputmode="decimal" placeholder="Amount put in"><input id="ic" class="full" type="number" inputmode="decimal" placeholder="Current value, blank if same"><button class="btn full" data-act="addInv">Add investment</button></div></div>`;
+}
+function vSpend(p){
+  const t=totals(p),list=[...t.m].sort((a,b)=>b.date.localeCompare(a.date));
+  return `<div class="card"><h2>Add spending</h2><div class="form"><input id="sa" type="number" inputmode="decimal" placeholder="Amount"><select id="sc">${CATS.map(x=>`<option>${x}</option>`).join('')}</select><input id="sn" placeholder="Note (optional)"><input id="sd" type="date" value="${today()}"><button class="btn full" data-act="addSp">Add spending</button></div></div>
+  <div class="card"><h2>This month · ${fmt(t.spent)}</h2>
+  ${list.length?list.map(s=>`<div class="row"><div class="grow"><b>${esc(s.category)}</b><small>${esc(s.date)}${s.note?' · '+esc(s.note):''}</small></div><span>${fmt(s.amount)}</span><button class="x" data-act="delSp:${s.id}" aria-label="Remove">×</button></div>`).join(''):'<p class="empty">Nothing spent yet this month.</p>'}</div>`;
+}
+function vDebt(p){const t=totals(p);return `<div class="card"><h2>Loans and EMIs · ${fmt(t.emi)} a month</h2>${p.debts.length?p.debts.map(d=>`<div class="row"><div class="grow"><b>${esc(d.name)}</b><small>${esc(d.type)} · EMI ${fmt(d.emi)}${d.rate?' · '+d.rate+'% a year':''}${d.months?' · '+d.months+' months left':''}</small></div><input class="amt" type="number" inputmode="decimal" value="${d.outstanding}" data-edit="debt:${d.id}" aria-label="Amount still owed on ${esc(d.name)}"><button class="x" data-act="delDebt:${d.id}" aria-label="Remove ${esc(d.name)}">×</button></div>`).join(''):'<p class="empty">No loans yet. Add a home loan, car loan, credit card dues or any EMI you pay.</p>'}<div class="form"><input id="dn" class="full" placeholder="Name, e.g. Home loan"><select id="dt" class="full" aria-label="Loan type">${opts(DEBT,'','Loan type')}</select><input id="do" type="number" inputmode="decimal" placeholder="Amount still owed"><input id="de" type="number" inputmode="decimal" placeholder="EMI per month"><input id="dr" type="number" inputmode="decimal" step="0.01" placeholder="Interest rate (% a year)"><input id="dm" type="number" inputmode="numeric" placeholder="Months left"><button class="btn full" data-act="addDebt">Add loan</button></div><p class="note">The amount on the right is what you still owe. Update it after each EMI. Debts are subtracted from your net worth.</p></div>`}
+const SUGG=['How much did I spend this month?','What is my biggest spending category?','How are my investments doing?','Can I afford a new laptop?','How much of my income goes to EMIs?'];
+function vAI(p){
+  return keyCard()+`<div class="card"><h2>Ask about ${esc(p.name)}’s money</h2>
+  <div class="chips">${SUGG.map((q,i)=>`<button class="chip" data-act="sugg:${i}">${esc(q)}</button>`).join('')}</div>
+  <div id="log" aria-live="polite"></div>
+  <div class="ask"><textarea id="q" placeholder="Ask a question about your money" aria-label="Your question"></textarea><button class="btn" data-act="send">Ask</button></div>
+  <p class="note">Answers use only the selected profile’s numbers. This isn’t licensed financial advice.</p></div>`;
+}
+function renderChat(){
+  const el=$('#log');if(!el)return;
+  const prev=el.children.length,list=chat[S.active];
+  el.innerHTML=list.map(m=>`<div class="msg ${m.role}">${m.content==='Thinking…'?'<span class="dots" role="img" aria-label="Thinking"><i></i><i></i><i></i></span>':esc(m.content)}</div>`).join('');
+  if(!REDUCED&&(prev>0||list.length<=2))for(let i=prev;i<list.length;i++)el.children[i].classList.add('new');
+}
+function render(anim){
+  const m=$('main');m.classList.remove('enter');if(anim&&!REDUCED){void m.offsetWidth;m.classList.add('enter')}
+  renderHead();const p=P();
+  $('#view').innerHTML={overview:vOverview,banks:vBanks,inv:vInv,spend:vSpend,debt:vDebt,future:vFuture,tips:vTips,ai:vAI}[tab](p);
+  if(tab==='ai')renderChat();
+}
+const PKEY='mymoney.photo';
+function getPhoto(){try{return localStorage.getItem(PKEY)||''}catch(e){return ''}}
+function paintAva(){const u=getPhoto();['#avaBtn','#bigAva'].forEach(s=>{const el=$(s);el.style.backgroundImage=u?'url("'+u+'")':'';el.textContent=u?'':'BK'})}
+function pav(p,s){return `<span class="pa" style="width:${s}px;height:${s}px;${p.photo?"background-image:url('"+p.photo+"')":''}">${p.photo?'':esc((p.name||'?').trim().charAt(0).toUpperCase())}</span>`}
+function shrink(f,n,cb){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=n;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,n,n);cb(c.toDataURL('image/jpeg',.82))};img.src=fr.result};fr.readAsDataURL(f)}
+async function hashPw(s,pw){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+pw));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkPw(p,pw){return !p.pw||(await hashPw(p.pw.s,pw||''))===p.pw.h}
+async function saveProfile(){
+  const p=P(),n=$('#pw1'),o=$('#pw0'),msg=t=>{const s=$('#saved');if(s)s.textContent=t};let pwSet=false;
+  try{
+    if(n&&n.value){
+      if(n.value.length<4){msg('Use at least 4 characters for the password.');return}
+      if(p.pw&&!await checkPw(p,o?o.value:'')){msg('The current password is wrong, so nothing was changed.');return}
+      const s=Math.random().toString(36).slice(2)+Date.now().toString(36);p.pw={s,h:await hashPw(s,n.value)};pwSet=true;
+    }
+  }catch(e){msg('Passwords need a secure page, so one could not be set here.');return}
+  p.done=true;const ok=save();if(!ok)p.done=false;render();
+  msg(ok?(pwSet?'Saved, and password set, at ':'Saved on this device at ')+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'Couldn’t save in this browser. Private browsing can block saving.');
+}
+function delPanel(p){
+  const all=del.scope==='all',need=(all?S.profiles:[p]).filter(q=>q.pw);
+  return `<div class="seg"><button class="pill" aria-pressed="${!all}" data-act="delScope:me">This profile</button><button class="pill" aria-pressed="${all}" data-act="delScope:all">Everything</button></div>
+  <p class="note">${all?'Removes both profiles, their photos and chats, and the maker photo from this device.':'Removes '+esc(p.name)+'’s numbers, details, photo and chats.'} It can’t be undone.</p>
+  ${need.map(q=>`<input class="dpw" type="password" id="dp${S.profiles.indexOf(q)}" autocomplete="current-password" placeholder="Password for ${esc(q.name)}">`).join('')||'<p class="note">No password is set. Add one in the profile to protect deleting.</p>'}
+  <p class="note neg" id="delerr" role="alert">${esc(del.err||'')}</p>
+  <div class="form"><button class="btn" style="background:var(--warn)" data-act="delGo">Delete</button><button class="pill" data-act="delCancel">Cancel</button></div>`;
+}
+async function doDelete(){
+  const all=del.scope==='all',targets=all?S.profiles:[P()];
+  for(const q of targets){if(q.pw){const el=$('#dp'+S.profiles.indexOf(q));let ok=false;try{ok=await checkPw(q,el?el.value:'')}catch(e){}if(!ok){del.err='Wrong password for '+q.name+'.';const er=$('#delerr');if(er)er.textContent=del.err;return}}}
+  if(all){try{localStorage.removeItem(KEY);localStorage.removeItem(PKEY);localStorage.removeItem(KKEY)}catch(e){}S=load();chat[0]=[];chat[1]=[];shown=null;paintAva()}
+  else{S.profiles[S.active]=blank('Person '+(S.active+1));chat[S.active]=[];save()}
+  del=null;tab='overview';render(true);
+}
+function projDefaults(p){const t=totals(p);return{years:10,ret:p.country==='India'?10:7,bankRate:3,save:Math.max(0,Math.round(p.income-t.spent-t.emi))}}
+function projCalc(p){
+  const j=Object.assign({},projDefaults(p),p.proj||{}),Y=Math.min(40,Math.max(1,Math.round(j.years))),t=totals(p);
+  let bank=t.bank,inv=t.inv,rows=[];const debts=p.debts.map(x=>({o:x.outstanding,e:x.emi,r:x.rate||0,s:x.outstanding>0?1:0}));
+  for(let m=1;m<=Y*12;m++){
+    bank*=1+j.bankRate/1200;inv*=1+j.ret/1200;let freed=0;
+    debts.forEach(x=>{if(x.s===1){x.o=Math.max(0,x.o*(1+x.r/1200)-x.e);if(x.o===0)x.s=2}else if(x.s===2)freed+=x.e});
+    inv+=j.save+freed;
+    if(m%12===0){const owed=debts.reduce((a,x)=>a+x.o,0);rows.push({y:m/12,nw:bank+inv-owed,bank,inv,owed})}
+  }
+  return{j,Y,rows};
+}
+function vFuture(p){
+  const c=projCalc(p),j=c.j,last=c.rows[c.rows.length-1],max=Math.max(1,...c.rows.map(r=>Math.abs(r.nw))),step=Math.max(1,Math.ceil(c.Y/10)),show=c.rows.filter(r=>r.y%step===0||r.y===c.Y);
+  return `<div class="card"><h2>Net worth after ${c.Y} years</h2><div class="big2 ${last.nw<0?'neg':'pos'}">${fmt(last.nw)}</div><p class="note">Bank ${fmt(last.bank)}, investments ${fmt(last.inv)}, loans left ${fmt(last.owed)}. This is an estimate, not a promise, and it isn’t adjusted for inflation.</p></div>
+  <div class="card"><h2>Assumptions</h2><div class="form"><label class="fl">Years<input type="number" inputmode="numeric" data-edit="proj:years" value="${j.years}"></label><label class="fl">Saved each month<input type="number" inputmode="decimal" data-edit="proj:save" value="${j.save}"></label><label class="fl">Investment return (% a year)<input type="number" inputmode="decimal" step="0.1" data-edit="proj:ret" value="${j.ret}"></label><label class="fl">Bank interest (% a year)<input type="number" inputmode="decimal" step="0.1" data-edit="proj:bankRate" value="${j.bankRate}"></label></div><p class="note">Monthly savings go into investments. When a loan finishes, its EMI is added to your savings. Clear a box to go back to the default.</p></div>
+  <div class="card"><h2>Year by year</h2>${show.map(r=>`<div class="bar"><span>Year ${r.y}</span><div><i style="width:${Math.max(2,Math.abs(r.nw)/max*100)}%"></i></div><span>${fmt(r.nw)}</span></div>`).join('')}</div>`;
+}
+function tips(p){
+  const t=totals(p),L=[],IN=p.country==='India',o=p.occupation,inc=p.income,burn=t.spent+t.emi;
+  const add=(k,title,text)=>L.push({k,title,text});
+  if(!o||!inc)add('info','Complete your profile','Add your occupation and monthly income so these suggestions fit you better.');
+  const target={'Student':3,'Corporate job':6,'Self-employed':9,'Homemaker':6}[o]||6;
+  if(burn>0){const m=t.bank/burn;add(m>=target?'good':'warn','Emergency fund: '+m.toFixed(1)+' months',m>=target?'Your bank balance covers about '+m.toFixed(1)+' months of spending and EMIs, which meets the '+target+'-month goal.':'Aim for '+target+' months of spending and EMIs in an easy-access account. You are about '+fmt(target*burn-t.bank)+' short.')}
+  if(inc>0&&t.emi>0){const s=Math.round(t.emi/inc*100);add(s>40?'warn':'good','EMIs take '+s+'% of your income',s>40?'Planners like this under about 40%. Avoid new loans and prepay the costliest one when you can.':'That is within a healthy range. Keep new EMIs from pushing it past 40%.')}
+  const bad=p.debts.filter(d=>d.type==='Credit card'||d.rate>=15);
+  if(bad.length)add('warn','Clear costly debt first','Pay down '+bad.map(d=>d.name).join(', ')+' before investing more, because the interest is likely higher than your returns.');
+  if(inc>0&&burn>0){const sr=Math.round((inc-burn)/inc*100);add(sr<0?'warn':sr<20?'info':'good',sr<0?'You are spending more than you earn':'You are saving about '+sr+'% of income',sr<0?'Spending and EMIs are above your income this month. Cut the biggest category first.':sr<20?'Try to reach 20% by trimming one category and automating a monthly transfer.':'Nice. Keep it going and move the extra into investments.')}
+  const top=Object.entries(t.cats).sort((a,b)=>b[1]-a[1])[0];
+  if(top&&t.spent>0&&top[1]/t.spent>.35)add('info',top[0]+' is '+Math.round(top[1]/t.spent*100)+'% of your spending','Check whether you can trim this one, since it moves your total the most.');
+  if(t.inv===0&&t.bank>0)add('info','Start investing small',(IN?'Begin with a small monthly SIP in an index fund.':'Begin with a small monthly purchase of a low-cost index fund.')+' Regular small amounts beat waiting for a big sum.');
+  const occ={'Student':'Set a monthly spending cap and use student discounts. Avoid carrying credit card dues while you study.','Corporate job':IN?'Cover yourself with term and health insurance, and use EPF or NPS for long-term saving. Check current tax rules before choosing.':'Get health and life cover, and use your workplace retirement plan. Check current tax rules before choosing.','Self-employed':'Keep business and personal money separate and set aside money for advance tax every month.','Homemaker':'Keep some savings in your own name and make sure the household has health and life cover.'}[o];
+  if(occ)add('info',o+' tip',occ);
+  const c=projCalc(p),r=c.rows[c.rows.length-1];
+  add('info','Where you are heading','At this pace your net worth could be about '+fmt(r.nw)+' in '+c.Y+' years. Open the Future tab to try different savings and returns.');
+  return L;
+}
+function vTips(p){
+  const L=tips(p),ai=p.aiTips==='Thinking…'&&!busy?'':(p.aiTips||'');
+  return `<div class="card"><h2>Suggestions for ${esc(p.name)}</h2>${L.map(x=>`<div class="tip ${x.k}"><b>${esc(x.title)}</b><span>${esc(x.text)}</span></div>`).join('')}<p class="note">These come from your own numbers, occupation and country. They aren’t licensed financial advice.</p></div>
+  <div class="card"><h2>Personal plan from AI</h2>${ai?`<div class="msg assistant" id="aitips">${ai==='Thinking…'?'<span class="dots" role="img" aria-label="Thinking"><i></i><i></i><i></i></span>':esc(ai)}</div>`:'<p class="empty">Get five specific suggestions written for you by the AI.</p>'}<button class="btn" data-act="tipsAI">${ai?'Refresh plan':'Get my plan'}</button></div>`;
+}
+async function aiTips(){
+  if(busy)return;busy=true;const p=P();p.aiTips='Thinking…';render();
+  try{
+    const sample=window.claude&&window.claude.use?await window.claude.use('sample'):null;
+    if(!sample){p.aiTips='The AI isn’t available in this view. Open the page from your Claude account to use it.';return}
+    const r=await sample(ctx(p)+'\n\nTask: Give exactly 5 prioritised, specific suggestions for this person, using their own numbers, occupation, country and loans. Each one gets a short title, then one or two sentences. No intro or outro.',{cache:false,onText:({text})=>{p.aiTips=text;const el=$('#aitips');if(el)el.textContent=text}});
+    p.aiTips=r.text||p.aiTips;save();
+  }catch(e){p.aiTips=e&&e.code==='no_key'?'Add your API key first, in the AI key box on the Ask AI tab.':e&&e.code==='bad_key'?'The API key was rejected. Check it on the Ask AI tab.':e&&e.code==='network'?'No internet connection, so the AI could not be reached.':'The AI couldn’t answer just now. Try again in a moment.'}
+  finally{busy=false;render()}
+}
+function guide(p){const g={'Student':'This is a student, so income may be a small allowance, stipend or nothing. Keep advice simple and low-risk. Prioritise a small emergency fund, clearing credit card or high-interest dues first, and understanding any education loan (interest may build up during study). Suggest tiny habits like a SIP of a few hundred rupees, a monthly spending cap and student discounts. Avoid risky or complicated products.','Corporate job':'This is a salaried corporate employee. Look at savings rate, an emergency fund of about six months of expenses, term and health insurance, EPF or NPS, and regular SIPs. Warn if EMIs go above about 40% of income, and watch for lifestyle inflation. Mention tax saving options only in general terms and say rules change, so they should check current ones.','Self-employed':'This person is self-employed, so income can be irregular. Suggest a larger emergency fund of nine to twelve months, keeping business and personal money separate, setting aside money for advance tax, and health and life insurance.','Homemaker':'This person manages a household. Focus on the household budget, savings kept in their own name, an emergency fund, and insurance. Keep suggestions practical.'};return g[p.occupation]||'The occupation is not set, so give general advice and suggest filling in the profile for sharper answers.'}
+function ctx(p){
+  const d={profile:{name:p.name,country:p.country,occupation:p.occupation||'not set',gender:p.gender||'not set'},monthlyIncome:p.income,loansAndEMIs:p.debts.map(x=>({name:x.name,type:x.type,amountStillOwed:x.outstanding,emiPerMonth:x.emi,interestRatePercentPerYear:x.rate,monthsLeft:x.months})),bankAccounts:p.accounts.map(a=>({name:a.name,balance:a.amount})),investments:p.investments.map(i=>({name:i.name,type:i.type,amountPutIn:i.invested,currentValue:i.current})),spending:p.spending.slice(-300).map(s=>({date:s.date,category:s.category,note:s.note,amount:s.amount}))};
+  return `You are a friendly money assistant inside a personal finance app. The person lives in ${p.country}. All amounts are in ${CUR()[0].trim()||'the local currency'}. Use local financial terms, products, taxes and norms for ${p.country}: for India that means EMI, lakh, crore, EPF, NPS and SIPs, and for other countries use their local equivalents. Never assume Indian rules for someone living elsewhere. Net worth is bank plus investments minus loans. Answer only from the data below, tailored to the person’s profile (occupation and income) and addressing them by name, in short plain sentences, doing any arithmetic carefully. If the data doesn’t cover the question, say what is missing. You are not a licensed advisor, so for big decisions suggest checking with one.\nGuidance for this person: ${guide(p)}\nAdapt the guidance above to ${p.country}, swapping India-specific products like EPF or NPS for local equivalents. Gender is only for pronouns and must never change the quality of advice.\nPerson: ${p.name}\nToday: ${today()}\nData: ${JSON.stringify(d)}`;
+}
+async function send(q){
+  q=(q||'').trim();if(!q||busy)return;
+  const idx=S.active,p=P(),log=chat[idx];
+  log.push({role:'user',content:q});const a={role:'assistant',content:'Thinking…'};log.push(a);
+  if($('#q'))$('#q').value='';renderChat();const L=$('#log');if(L&&L.children.length>1)L.children[L.children.length-2].scrollIntoView({block:'start',behavior:'smooth'});busy=true;
+  try{
+    const sample=window.claude&&window.claude.use?await window.claude.use('sample'):null;
+    if(!sample){a.content='The AI chat isn’t available in this view. Open the page from your Claude account to use it.';return}
+    let h=log.slice(0,-2).filter(m=>m.content!=='Thinking…').slice(-8);
+    while(h.length&&h[0].role!=='user')h.shift();
+    const msgs=[...h,{role:'user',content:ctx(p)+'\n\nQuestion: '+q}];
+    const r=await sample(msgs,{cache:false,onText:({text})=>{a.content=text;if(S.active===idx)renderChat()}});
+    a.content=r.text||a.content;
+  }catch(e){
+    a.content=e&&e.code==='no_key'?'Add your API key first, in the AI key box above.':e&&e.code==='bad_key'?'The API key was rejected. Check it in the AI key box.':e&&e.code==='network'?'No internet connection, so the AI could not be reached.':e&&e.code==='rate_limited'?'Too many questions in a row. Wait a minute and try again.':'The AI couldn’t answer just now. Try again in a moment.';
+  }finally{busy=false;if(S.active===idx)renderChat()}
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const[act,arg]=b.dataset.act.split(':'),p=P();
+  if(act.startsWith('del')&&!REDUCED&&!b.dataset.go){const r=b.closest('.row');if(r){if(!r.classList.contains('out')){r.classList.add('out');setTimeout(()=>{b.dataset.go='1';b.click()},180)}return}}
+  if(act==='tab'){tab=arg;render(true);return}
+  if(act==='profile'){S.active=+arg;save();render(true);return}
+  if(act==='sugg'){send(SUGG[+arg]);return}
+  if(act==='about'){$('#about').showModal();return}
+  if(act==='closeAbout'){$('#about').close();return}
+  if(act==='photo'){$('#photo').click();return}
+  if(act==='tipsAI'){aiTips();return}
+  if(act==='keySave'){const v=$('#akey').value.trim();if(v){try{localStorage.setItem(KKEY,v)}catch(e){}}render();return}
+  if(act==='keyDel'){try{localStorage.removeItem(KKEY)}catch(e){}render();return}
+  if(act==='delOpen'){del={scope:'me',err:''};render();return}
+  if(act==='delScope'){del.scope=arg;del.err='';render();return}
+  if(act==='delCancel'){del=null;render();return}
+  if(act==='delGo'){doDelete();return}
+  if(act==='ppic'){$('#ppicf').click();return}
+  if(act==='ppicx'){p.photo='';save();render();return}
+  if(act==='editProfile'){p.done=false;save();render();return}
+  if(act==='save'){saveProfile();return}
+  if(act==='send'){send($('#q').value);return}
+  if(act==='addAcc'){const n=$('#an').value.trim();if(!n)return;p.accounts.push({id:uid(),name:n,amount:num('aa')})}
+  else if(act==='delAcc')p.accounts=p.accounts.filter(x=>x.id!==arg);
+  else if(act==='addInv'){const n=$('#in').value.trim();if(!n)return;const inv=num('ii'),c=$('#ic').value;p.investments.push({id:uid(),name:n,type:$('#it').value,invested:inv,current:c===''?inv:num('ic')})}
+  else if(act==='delInv')p.investments=p.investments.filter(x=>x.id!==arg);
+  else if(act==='addSp'){const a=num('sa');if(!a)return;p.spending.push({id:uid(),amount:a,category:$('#sc').value,note:$('#sn').value.trim(),date:$('#sd').value||today()})}
+  else if(act==='delSp')p.spending=p.spending.filter(x=>x.id!==arg);
+  else if(act==='addDebt'){const n=$('#dn').value.trim();if(!n)return;p.debts.push({id:uid(),name:n,type:$('#dt').value||'Other',outstanding:num('do'),emi:num('de'),rate:num('dr'),months:Math.round(num('dm'))})}
+  else if(act==='delDebt')p.debts=p.debts.filter(x=>x.id!==arg);
+  save();render();
+});
+document.addEventListener('change',e=>{
+  const k=e.target.dataset&&e.target.dataset.edit;if(!k)return;
+  const[kind,id]=k.split(':'),p=P(),v=Math.max(0,parseFloat(e.target.value)||0);
+  if(kind==='acc'){const a=p.accounts.find(x=>x.id===id);if(a)a.amount=v}
+  else if(kind==='inv'){const a=p.investments.find(x=>x.id===id);if(a)a.current=v}
+  else if(kind==='debt'){const a=p.debts.find(x=>x.id===id);if(a)a.outstanding=v}
+  else if(kind==='income')p.income=v;
+  else if(kind==='occupation')p.occupation=e.target.value;
+  else if(kind==='gender')p.gender=e.target.value;
+  else if(kind==='country')p.country=e.target.value;
+  else if(kind==='phone')p.phone=e.target.value.trim().slice(0,20);
+  else if(kind==='email')p.email=e.target.value.trim().slice(0,80);
+  else if(kind==='proj'){p.proj=p.proj||{};if(e.target.value==='')delete p.proj[id];else p.proj[id]=id==='years'?Math.max(1,Math.min(40,Math.round(v))):v}
+  else if(kind==='name')p.name=e.target.value.trim()||'Person '+(S.active+1);
+  save();render();
+});
+document.addEventListener('keydown',e=>{if(e.target.id==='q'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();send(e.target.value)}});
+$('#about').addEventListener('click',e=>{if(e.target.id==='about')e.target.close()});
+$('#photo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,160,160);try{localStorage.setItem(PKEY,c.toDataURL('image/jpeg',.82))}catch(x){}paintAva()};img.src=fr.result};fr.readAsDataURL(f);e.target.value=''});
+document.addEventListener('change',e=>{if(e.target.id!=='ppicf')return;const f=e.target.files[0];if(!f)return;shrink(f,128,u=>{P().photo=u;save();render()})});
+paintAva();
+render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
